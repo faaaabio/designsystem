@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-DOC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ============================== */
+        /* 1. Geral                     */
+        /* ============================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Colors */
+            --primary-color: #000000;
+            --secondary-color: #333333;
+            --accent-color: #000000;
+            --background-color: #E7E5DE;
+            --sidebar-bg: #F5F3EE;
+            --content-bg: var(--background-color);
+            --text-color: #000000;
+            --light-text: #333333;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --card-bg: rgba(0, 0, 0, 0.03);
+            --card-hover: rgba(0, 0, 0, 0.05);
+            --code-bg: #F5F3EE;
+            --highlight-bg: #FFFACC;
+            --priority-1-bg: #d1e7dd; 
+            --priority-1-text: #0f5132;
+            --priority-2-bg: #fff3cd; 
+            --priority-2-text: #664d03;
+            --priority-3-bg: #f8d7da; 
+            --priority-3-text: #842029;
+
+
+            /* Max Width */
+            --max-width: 1200px;
+
+            /* Spacing */
+            --spacing-xs: 0.25rem;  /* 4px */
+            --spacing-sm: 0.5rem;   /* 8px */
+            --spacing-md: 1rem;     /* 16px */
+            --spacing-lg: 1.5rem;   /* 24px */
+            --spacing-xl: 2rem;     /* 32px */
+            --spacing-2xl: 3rem;    /* 48px */
+            --spacing-3xl: 4rem;    /* 64px */
+            --spacing-4xl: 6rem;    /* 96px */
+            --spacing-5xl: 8rem;    /* 128px */
+
+            /* Typography */
+            --text-xs: 0.75rem;     /* 12px */
+            --text-sm: 0.9rem;      /* 14px */
+            --text-base: 1rem;      /* 16px */
+            --text-md: 1.1rem;      /* 18px */
+            --text-lg: 1.2rem;      /* 20px */
+            --text-xl: 1.5rem;      /* 24px */
+            --text-2xl: 2rem;       /* 32px */
+            --text-3xl: 2.5rem;     /* 40px */
+            --text-4xl: 3rem;       /* 48px */
+            --text-5xl: 4.5rem;     /* 72px */
+
+            /* Borders */
+            --radius-sm: 0.5rem;    /* 8px */
+            --radius-md: 1rem;      /* 16px */
+            --radius-lg: 1.5rem;    /* 24px */
+            --radius-full: 100px;
+
+            /* Layout specifics */
+            --header-height: 60px;
+            --sidebar-width: 260px;
+            --sidebar-width-md: 220px;
+        }
+
+        body {
+            font-family: 'Epilogue', sans-serif;
+            font-weight: 400;
+            line-height: 1.6;
+            letter-spacing: -0.3px;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block; 
+        }
+
+        a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--text-color);
+            transition: width 0.3s ease;
+        }
+
+        a:hover::after {
+            width: 100%;
+        }
+        a:hover {
+            opacity: 0.8;
+        }
+
+        p a, li a:not(.btn) {
+             color: var(--text-color);
+             text-decoration: none;
+        }
+        p a:hover::after, li a:not(.btn):hover::after {
+             width: 100%;
+         }
+
+        /* ============================== */
+        /* 2. Layout                   */
+        /* ============================== */
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(231, 229, 222, 0.8); 
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-md) var(--spacing-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            height: var(--header-height);
+            backdrop-filter: blur(10px); 
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 600;
+            font-size: var(--text-md);
+        }
+
+        .logo img {
+            height: 30px; 
+            width: auto;
+        }
+
+        .top-nav {
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: center;
+        }
+
+        .top-nav a {
+            font-size: var(--text-sm);
+            text-decoration: none;
+        }
+        .top-nav a::after {
+             display: none; 
+        }
+
+         .btn-top-nav {
+             background: var(--primary-color);
+             color: white;
+             padding: 6px 12px;
+             border-radius: var(--radius-full);
+             font-size: var(--text-xs);
+         }
+         .btn-top-nav:hover {
+              opacity: 0.9;
+             transform: translateY(-1px);
+         }
+         .btn-top-nav::after { display: none; }
+
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            height: calc(100vh - var(--header-height)); 
+            position: fixed;
+            top: var(--header-height); 
+            left: 0;
+            overflow-y: auto; 
+            padding: var(--spacing-xl) 0;
+            border-right: 1px solid var(--border-color);
+            z-index: 90; 
+        }
+
+        .sidebar-section {
+            padding: 0 var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .sidebar-title {
+            text-transform: uppercase;
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--light-text);
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 2px; 
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: var(--spacing-xs) 0; 
+            font-size: var(--text-sm);
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        .sidebar-menu a::after {
+             display: none; 
+        }
+
+        .sidebar-menu a.active {
+            font-weight: 600; 
+        }
+
+        .sidebar-menu a:hover {
+            opacity: 0.7;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width); 
+            margin-top: var(--header-height);  
+            padding: var(--spacing-2xl);
+            width: calc(100% - var(--sidebar-width));
+            background-color: var(--content-bg);
+            min-height: calc(100vh - var(--header-height)); 
+        }
+
+        /* Content Section Styling (Generic) */
+        .content-section-header { 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg); 
+        }
+        .content-section-header h1,
+        .content-section-header h2 {
+            margin-bottom: 0; 
+        }
+
+        .content-section {
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-2xl);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--content-bg);
+        }
+       
+        .page-header-section {
+             margin-bottom: var(--spacing-2xl);
+             padding-bottom: var(--spacing-lg);
+             border-bottom: 1px solid var(--border-color); 
+             background-color: var(--content-bg); 
+             padding-left: var(--spacing-2xl);
+             padding-right: var(--spacing-2xl);
+             margin-left: 0;
+             margin-right: 0;
+             width: 100%;
+             position: relative; 
+        }
+
+         .page-header-section:first-of-type { 
+             padding-top: calc(var(--spacing-2xl) + var(--header-height)); 
+             scroll-margin-top: var(--header-height);
+         }
+         
+         .page-header-section .content-section-header h1 { 
+            margin-bottom: 0;
+         }
+         .intro-image {
+            margin-bottom: var(--spacing-xl); 
+            border-radius: var(--radius-md); 
+            overflow: hidden; 
+         }
+
+
+         /* Scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        section { 
+            scroll-margin-top: calc(var(--header-height) + var(--spacing-md)); 
+        }
+
+
+        /* ============================== */
+        /* 3. Typography                */
+        /* ============================== */
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 400;
+            line-height: 1.1;
+            margin-top: var(--spacing-lg);
+            font-style: normal;
+        }
+
+        h1 { font-size: var(--text-5xl); margin-bottom: var(--spacing-3xl); }
+        h2 { font-size: var(--text-2xl); margin-bottom: var(--spacing-2xl); }
+        h3 { font-size: var(--text-lg); margin-bottom: var(--spacing-lg); }
+        p { font-size: var(--text-base); line-height: 1.6; margin-bottom: var(--spacing-md); }
+
+        /* ============================== */
+        /* 4. Components (Examples)     */
+        /* ============================== */
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--radius-full);
+            font-weight: 400;
+            font-size: var(--text-base);
+            line-height: 1;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            font-family: 'Epilogue', sans-serif;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        .btn::after { display: none; }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        .btn:active {
+             transform: translateY(0);
+             opacity: 0.9;
+        }
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        .btn:disabled { 
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(0);
+            pointer-events: none;
+        }
+
+        /* Tags (used for priority) */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            line-height: 1;
+            border: 1px solid transparent; 
+            min-width: 80px;
+            text-align: center;
+        }
+
+        button.tag { 
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: none; 
+        }
+
+        button.tag:disabled {
+            opacity: 1; 
+            cursor: default; 
+            border-width: 1px; 
+            border-style: solid;
+        }
+
+        .tag.priority-1 {
+            background-color: var(--priority-1-bg);
+            color: var(--priority-1-text);
+            border-color: var(--priority-1-text);
+        }
+        .tag.priority-2 {
+            background-color: var(--priority-2-bg);
+            color: var(--priority-2-text);
+            border-color: var(--priority-2-text);
+        }
+        .tag.priority-3 {
+            background-color: var(--priority-3-bg);
+            color: var(--priority-3-text);
+            border-color: var(--priority-3-text);
+        }
+
+
+        /* ============================== */
+        /* 5. Utilities                 */
+        /* ============================== */
+        .mt-md { margin-top: var(--spacing-md); }
+
+        /* ============================== */
+        /* 6. Responsiveness            */
+        /* ============================== */
+        @media (max-width: 1024px) { 
+            .sidebar {
+                width: var(--sidebar-width-md);
+            }
+            .main-content {
+                margin-left: var(--sidebar-width-md);
+                width: calc(100% - var(--sidebar-width-md));
+                padding: var(--spacing-xl);
+            }
+            h1 { font-size: var(--text-4xl); }
+            h2 { font-size: var(--text-xl); }
+            .content-section {
+                 padding: var(--spacing-lg);
+            }
+        }
+
+        @media (max-width: 768px) { /* Mobile */
+            .top-header {
+                padding: var(--spacing-md);
+                background-color: var(--background-color);
+                backdrop-filter: none;
+            }
+            .logo { cursor: pointer; }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                position: fixed;
+                top: var(--header-height);
+                left: 0;
+                height: calc(100vh - var(--header-height));
+                background-color: var(--sidebar-bg);
+                width: 250px;
+                padding: var(--spacing-lg) 0;
+                z-index: 1000;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                width: 100%;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: var(--spacing-lg);
+            }
+            h1 { font-size: var(--text-3xl); }
+            h2 { font-size: var(--text-xl); }
+            .content-section {
+                 padding: var(--spacing-md);
+            }
+             .page-header-section:first-of-type { 
+                 padding-left: var(--spacing-lg);
+                 padding-right: var(--spacing-lg);
+                 margin-left: calc(var(--spacing-lg) * -1);
+                 margin-right: calc(var(--spacing-lg) * -1);
+                 width: calc(100% + var(--spacing-lg) * 2);
+                 padding-top: calc(var(--spacing-lg) + var(--header-height)); 
+             }
+            .content-section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-sm); 
+            }
+            .content-section-header h1,
+            .content-section-header h2 {
+                font-size: var(--text-xl); 
+            }
+            .tag { 
+                min-width: auto;
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="top-header">
+            <div class="logo">
+                <img src="https://global.divhunt.com/3e41e8f57ebbed882520a4fd1dc34dc0_1610.svg" alt="Kaizen Logo">
+            </div>
+            <nav class="top-nav">
+                <a href="#">v1.0.0</a> <a href="https://github.com/seu-usuario/seu-repo" class="btn btn-top-nav" target="_blank">GitHub</a>
+            </nav>
+        </header>
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">INTRO</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#o-que-e-esta-documentacao" class="active">O que é esta documentação?</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">DESIGN</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#ia">IA</a></li>
+                    <li><a href="#startups">Startups</a></li>
+                    <li><a href="#produto">Produto</a></li>
+                    <li><a href="#kaizen-ds">Kaizen DS</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">BLOG</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#blog-cadastro">Cadastro</a></li>
+                    <li><a href="#blog-pilulas">Pilulas</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">APP</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#app-calculadora">Calculadora</a></li>
+                    <li><a href="#app-checkout">Checkout</a></li>
+                    <li><a href="#app-contrato">Contrato online</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section id="o-que-e-esta-documentacao" class="page-header-section">
+                <div class="content-section-header">
+                    <h1>O que é esta documentação?</h1>
+                </div>
+                <p>Repositório centralizado de projetos e informações sobre IA e outras iniciativas, organizado por categorias na barra lateral.</p>
+            </section>
+
+            <section id="ia" class="content-section">
+                <div class="content-section-header">
+                    <h2>IA</h2>
+                    <button class="tag priority-1" disabled>Prioridade 1</button>
+                </div>
+                <p>Criação de landing page com foco em SEO para destacar a aplicação de IA no design, visando alta visibilidade.</p>
+                <a href="https://www.ofabio.com/br/ia-design.html" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+
+            <section id="startups" class="content-section">
+                <div class="content-section-header">
+                    <h2>Startups</h2>
+                    <button class="tag priority-1" disabled>Prioridade 1</button>
+                </div>
+                <p>Desenvolvimento de design para startups, priorizando SEO e IA para atrair usuários e melhorar visibilidade online.</p>
+                <a href="https://www.ofabio.com/br/design-para-startups.html" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+
+            <section id="produto" class="content-section">
+                <div class="content-section-header">
+                    <h2>Produto</h2>
+                    <button class="tag priority-1" disabled>Prioridade 1</button>
+                </div>
+                <p>Foco no desenvolvimento de produto relacionado a SEO e IA, com alta prioridade no portfólio da empresa.</p>
+                <a href="https://www.ofabio.com/br/" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+
+            <section id="kaizen-ds" class="content-section">
+                <div class="content-section-header">
+                    <h2>Kaizen DS</h2>
+                    <button class="tag priority-2" disabled>Prioridade 2</button>
+                </div>
+                <p>Criação e implementação de um design system com SEO e IA para otimizar UX e visibilidade online.</p>
+                <a href="https://designsystem.ofabio.com.br/doc.html" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+
+            <section id="blog-cadastro" class="content-section">
+                <div class="content-section-header">
+                    <h2>Cadastro</h2>
+                    <button class="tag priority-2" disabled>Prioridade 2</button>
+                </div>
+                <p>Otimização de SEO e uso de IA para aumentar a visibilidade online e facilitar o acesso a informações relevantes.</p>
+                <a href="https://news.ofabio.com.br/cadastro" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+
+            <section id="blog-pilulas" class="content-section">
+                <div class="content-section-header">
+                    <h2>Pilulas</h2>
+                    <button class="tag priority-2" disabled>Prioridade 2</button>
+                </div>
+                <p>Seleção de estratégias de SEO e IA para otimizar conteúdo e gerar tráfego, com link para fonte de notícias relacionada.</p>
+                <a href="http://news.ofabio.com.br/" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+
+            <section id="app-calculadora" class="content-section">
+                <div class="content-section-header">
+                    <h2>Calculadora</h2>
+                    <button class="tag priority-3" disabled>Prioridade 3</button>
+                </div>
+                <p>Desenvolvimento de aplicativo de cálculo com interface amigável, priorizando a experiência do usuário.</p>
+                <a href="https://app.ofabio.com.br/calculadora.html" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+
+            <section id="app-checkout" class="content-section">
+                <div class="content-section-header">
+                    <h2>Checkout</h2>
+                    <button class="tag priority-3" disabled>Prioridade 3</button>
+                </div>
+                <p>Interface eficiente para compras online, otimizando a experiência do usuário para um checkout rápido e seguro.</p>
+                <a href="https://app.ofabio.com.br/checkout.html" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+
+            <section id="app-contrato" class="content-section">
+                <div class="content-section-header">
+                    <h2>Contrato online</h2>
+                    <button class="tag priority-3" disabled>Prioridade 3</button>
+                </div>
+                <p>Revisão e assinatura de contrato de prestação de serviços com visualização das cláusulas.</p>
+                <a href="https://ofabio.com/br/contrato" class="btn btn-primary mt-md" target="_blank">Saiba Mais</a>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Get sidebar and overlay elements
+        const sidebar = document.querySelector('.sidebar');
+        // const overlay = document.querySelector('.overlay'); // Uncomment if using overlay
+
+        // Mobile Menu Toggle (Clicking the Logo)
+        const logo = document.querySelector('.logo');
+        if (logo) {
+            logo.addEventListener('click', function(e) {
+                const isMobile = window.matchMedia("(max-width: 768px)").matches;
+                if (isMobile) {
+                    e.preventDefault(); // Prevent default link behavior on mobile if logo is a link
+                    sidebar.classList.toggle('active');
+                    // document.body.classList.toggle('sidebar-open'); // Optional: for body-level styling
+                    // if (overlay) overlay.classList.toggle('active'); // Uncomment if using overlay
+                }
+            });
+        }
+
+        // Close sidebar when a link inside is clicked (on mobile) or overlay is clicked
+        document.querySelectorAll('.sidebar-menu a[href^="#"]').forEach(link => {
+            link.addEventListener('click', () => {
+                const isMobile = window.matchMedia("(max-width: 768px)").matches;
+                if (isMobile && sidebar.classList.contains('active')) {
+                    setTimeout(() => { // Add a small delay to allow smooth scroll to start
+                       sidebar.classList.remove('active');
+                       // document.body.classList.remove('sidebar-open');
+                       // if (overlay) overlay.classList.remove('active'); // Uncomment if using overlay
+                    }, 100);
+                }
+            });
+        });
+
+        // Highlight active sidebar link on scroll
+        const sections = document.querySelectorAll('main section[id]'); 
+        const sidebarLinks = document.querySelectorAll('.sidebar-menu a[href^="#"]');
+        const headerElement = document.querySelector('.top-header');
+        const headerHeight = headerElement ? headerElement.offsetHeight : 0;
+        const scrollOffset = headerHeight + parseInt(getComputedStyle(document.documentElement).getPropertyValue('--spacing-md') || '16px');
+
+        function highlightSidebarLink() {
+            let currentSectionId = '';
+            const fromTop = window.pageYOffset + scrollOffset; 
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (section.id && fromTop >= sectionTop && fromTop < sectionTop + section.offsetHeight) {
+                    currentSectionId = '#' + section.id;
+                }
+            });
+            if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 20) { 
+                if (sections.length > 0) {
+                    const lastSection = sections[sections.length - 1];
+                    if (lastSection.id) currentSectionId = '#' + lastSection.id;
+                }
+            }
+
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentSectionId) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        window.addEventListener('scroll', highlightSidebarLink);
+        document.addEventListener('DOMContentLoaded', () => {
+            highlightSidebarLink(); 
+            if (window.pageYOffset < scrollOffset && sidebarLinks.length > 0) {
+                 let activeFound = false;
+                 sidebarLinks.forEach(sl => { if(sl.classList.contains('active')) activeFound = true; });
+                 if (!activeFound) {
+                    sidebarLinks.forEach(sl => sl.classList.remove('active'));
+                    const firstLinkHref = sidebarLinks[0].getAttribute('href');
+                    if (firstLinkHref && document.querySelector(firstLinkHref)) {
+                         sidebarLinks[0].classList.add('active');
+                    }
+                 }
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('#') && href.length > 1) {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                        const offsetPosition = elementPosition - headerHeight - parseInt(getComputedStyle(document.documentElement).getPropertyValue('--spacing-sm') || '8px');
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+                        if (isMobile && sidebar.classList.contains('active')) {
+                             setTimeout(() => {
+                                sidebar.classList.remove('active');
+                             }, 300); 
+                        }
+                    }
+                } else if (href === '#') { 
+                     e.preventDefault();
+                     window.scrollTo({
+                         top: 0,
+                         behavior: 'smooth'
+                     });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
